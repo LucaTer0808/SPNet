@@ -59,11 +59,11 @@ for i in range(test_loader.size):
     depth   = depth.cuda()
     pre_res = model(image,depth)
     res     = pre_res[2]     
-    res     = F.upsample(res, size=gt.shape, mode='bilinear', align_corners=False)
+    res     = F.interpolate(res, size=gt.shape[:2], mode='bilinear', align_corners=False)
     res     = res.sigmoid().data.cpu().numpy().squeeze()
     res     = (res - res.min()) / (res.max() - res.min() + 1e-8)
         
-    cv2.imwrite(target_path + name,res*255)
+    cv2.imwrite(target_path + name, (res*255).astype(np.uint8))  # Save the predicted map as an image
 
 torch.cuda.synchronize()
 end_time = time.time()
